@@ -12,6 +12,8 @@ import {
 import { createTerrain, createPath } from "./terrain.js";
 import { createForest, updateWind } from "./forest.js";
 import { createPalace } from "./palace.js";
+import { GLTFLoader } from "../vendor/loaders/GLTFLoader.js";
+import { setHeightFn, buildMeshSampler } from "./heightfield.js";
 
 const canvas = document.getElementById("scene");
 const loadingEl = document.getElementById("loading");
@@ -27,7 +29,7 @@ function init() {
   requestAnimationFrame(() => setTimeout(boot, 60));
 }
 
-function boot() {
+async function boot() {
   renderer = new THREE.WebGLRenderer({
     canvas,
     antialias: true,
@@ -53,10 +55,14 @@ function boot() {
 
   clock = new THREE.Clock();
 
-  buildWorld();
   setupLights();
   setupSky();
 
+  // Try to load a Sketchfab terrain (www/assets/terrain.glb). Falls back to
+  // the procedural terrain when the file is not present.
+  const terrain = await loadSketchfabTerrain();
+
+  buildWorld(terrain);
   controls = new OrbitControls(camera, canvas);
   controls.target.set(0, 14, 0);
   controls.setView(150, 0.9, 0.6); // radius, phi, theta
@@ -65,14 +71,68 @@ function boot() {
   document.addEventListener("visibilitychange", () => clock.getDelta());
 
   // Debug handle (used by the smoke test; harmless on device).
-  window.__game = { scene, camera, renderer };
+  window.__game = { scene, camera, renderer, terrainLoaded: !!terrain };
 
   // Reveal the scene.
   loadingEl.classList.add("hidden");
   animate();
 }
 
-function buildWorld() {
+// Download a Sketchfab terrain GLB into www/assets/terrain.glb, then this
+// loads it, normalizes its scale, and builds a height sampler so vegetation
+// and the palace sit on the real ground.
+async function loadSketchfabTerrain() {
+  const url = "assets/terrain.glb";
+  try {
+    const head = await fetch(url, { method: "HEAD" });
+    if (!head.ok) return null;
+  } catch {
+    return null;
+  }
+  try {
+    const gltf = await new GLTFLoader().loadAsync(url);
+    const root = gltf.scene;
+
+    // Normalize horizontal size to ~620 units.
+    let box = new THREE.Box3().setFromObject(root);
+    let size = box.getSize(new THREE.Vector3());
+    const maxXZ = Math.max(size.x, size.z) || 1;
+    const s = 620 / maxXZ;
+    root.scale.setScalar(s);
+    root.updateWorldMatrix(true, true);
+
+    // Center on origin.
+    box = new THREE.Box3().setFromObject(root);
+    const c = box.getCenter(new THREE.Vector3());
+    root.position.x -= c.x;
+    root.position.z -= c.z;
+    root.updateWorldMatrix(true, true);
+
+    // Drop so the center of the terrain sits at y≈0.
+    const ray = new THREE.Raycaster();
+    ray.set(new THREE.Vector3(0, 4000, 0), new THREE.Vector3(0, -1, 0));
+    const hit = ray.intersectObject(root, true)[0];
+    root.position.y -= hit ? hit.point.y : 0;
+    root.updateWorldMatrix(true, true);
+
+    root.traverse((o) => {
+      if (o.isMesh) {
+        o.receiveShadow = true;
+        o.castShadow = false;
+      }
+    });
+    root.name = "sketchfab-terrain";
+
+    // Build the height sampler BEFORE placing vegetation / palace.
+    setHeightFn(buildMeshSampler(root, 640, 128));
+    return { mesh: root };
+  } catch (e) {
+    console.warn("Sketchfab terrain failed to load, using procedural.", e);
+    return null;
+  }
+}
+
+function buildWorld(terrain) {
   // ---- materials (2K procedural textures) --------------------------------
   const grass = makeGrassTexture();
   grass.repeat.set(48, 48);
@@ -102,7 +162,11 @@ function buildWorld() {
     }),
   };
 
-  scene.add(createTerrain(materials));
+  if (terrain) {
+    scene.add(terrain.mesh); // real Sketchfab ground (sampler already set)
+  } else {
+    scene.add(createTerrain(materials)); // procedural fallback
+  }
   scene.add(createPath(materials));
   scene.add(createForest());
   scene.add(createPalace(materials));

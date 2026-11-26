@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "npx --yes http-server www -p 8080 -c-1",
+    "terrain:fetch": "node scripts/fetch-sketchfab.mjs",
     "sync": "cap sync",
     "add:android": "cap add android",
     "open:android": "cap open android",

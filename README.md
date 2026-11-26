@@ -46,6 +46,26 @@ android/             Native Android (Capacitor) project
 scripts/smoke.mjs    Headless smoke test (Puppeteer)
 ```
 
+## Use a real terrain from Sketchfab
+
+The game loads `www/assets/terrain.glb` if present; otherwise it uses the
+procedural terrain. To pull a CC-licensed terrain from Sketchfab:
+
+1. Get a free API token: Sketchfab → **Settings → API → Copy token**.
+2. Download a model (replace `<uid>` with the model's UID from its URL):
+
+   ```bash
+   SKETCHFAB_TOKEN=your_token node scripts/fetch-sketchfab.mjs <uid>
+   # saves to www/assets/terrain.glb
+   ```
+
+3. Reload. The terrain is auto-scaled to ~620 units, centered, and a height
+   sampler is built by raycasting it, so trees, plants and the palace sit on the
+   real ground. The token is read from the environment and never stored.
+
+Find downloadable models with:
+`curl -s "https://api.sketchfab.com/v3/search?type=models&q=terrain&downloadable=true"`
+
 ## Run in a browser (fast iteration)
 
 ```bash

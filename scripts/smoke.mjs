@@ -20,8 +20,9 @@ const errors = [];
 const logs = [];
 page.on("pageerror", (e) => errors.push("PAGEERROR: " + e.message));
 page.on("response", (r) => {
-  if (r.status() >= 400 && !/favicon\.ico/.test(r.url()))
-    errors.push(`HTTP ${r.status()} ${r.url()}`);
+  const u = r.url();
+  if (r.status() >= 400 && !/favicon\.ico/.test(u) && !/assets\/terrain\.glb/.test(u))
+    errors.push(`HTTP ${r.status()} ${u}`);
 });
 page.on("console", (m) => {
   logs.push(m.type() + ": " + m.text());

@@ -1,7 +1,7 @@
 // forest.js — Full realistic forest: many tree species + understory plants,
 // grass and flowers. Alpha-cutout billboards, 3D hero trunks, wind sway.
 import * as THREE from "three";
-import { terrainHeight } from "./terrain.js";
+import { heightAt } from "./heightfield.js";
 import {
   makeTreeTexture,
   makePoplarTexture,
@@ -148,7 +148,7 @@ export function createForest(count = 540) {
     if (d < 100) continue;
     if (Math.abs(x - Math.sin((z / 300) * Math.PI * 2) * 10) < 13 && z > 78) continue;
     const t = pick(trees, R());
-    const y = terrainHeight(x, z);
+    const y = heightAt(x, z);
     const h = t.h[0] + R() * (t.h[1] - t.h[0]);
     const wf = t.wf[0] + R() * (t.wf[1] - t.wf[0]);
     pos.set(x, y - 0.3, z);
@@ -204,7 +204,7 @@ export function createForest(count = 540) {
     const d = Math.hypot(x, z);
     if (d < 74) continue;
     const p = pick(plants, R());
-    const y = terrainHeight(x, z);
+    const y = heightAt(x, z);
     const s = p.s[0] + R() * (p.s[1] - p.s[0]);
     pos.set(x, y - 0.1, z);
     q.setFromAxisAngle(up, R() * Math.PI * 2);
@@ -254,7 +254,7 @@ function createHeroTrees(R) {
     [-40, 330],
   ];
   for (const [x, z] of spots) {
-    const y = terrainHeight(x, z);
+    const y = heightAt(x, z);
     const trunkH = 7 + R() * 3;
     const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.6, trunkH, 8), barkMat);
     trunk.position.set(x, y + trunkH / 2, z);
