@@ -91,10 +91,17 @@ cd android && ./gradlew assembleDebug
 # APK: android/app/build/outputs/apk/debug/app-debug.apk
 ```
 
-> Note: this cloud sandbox has no JDK/Android SDK, so the APK is not compiled
-> here. The native project is fully generated and ready to open in Android
-> Studio. The game itself was verified to build and render via the headless
-> smoke test (`node scripts/smoke.mjs`).
+If Maven Central is blocked (some sandboxes/proxies), prepend a mirror:
+
+```bash
+cd android && ./gradlew assembleDebug --init-script ../scripts/init-aliyun.gradle
+```
+
+> The debug APK is built in this sandbox and copied to
+> `/artifacts/forest-palace-fort.apk` (package `com.example.forestpalacefort`,
+> minSdk 22, target 34). Toolchain: JDK 17 at `/opt/jdk17`, Android SDK at
+> `/opt/android-sdk`. The game is also verified via the headless smoke test
+> (`node scripts/smoke.mjs`) and preview renders (`node scripts/preview.mjs`).
 
 ## Performance notes
 

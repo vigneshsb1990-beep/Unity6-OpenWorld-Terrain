@@ -71,7 +71,7 @@ async function boot() {
   document.addEventListener("visibilitychange", () => clock.getDelta());
 
   // Debug handle (used by the smoke test; harmless on device).
-  window.__game = { scene, camera, renderer, terrainLoaded: !!terrain };
+  window.__game = { scene, camera, renderer, controls, terrainLoaded: !!terrain };
 
   // Reveal the scene.
   loadingEl.classList.add("hidden");

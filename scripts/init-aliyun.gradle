@@ -1,0 +1,19 @@
+// Force Aliyun mirrors ahead of Maven Central (blocked by the sandbox proxy).
+settingsEvaluated { s ->
+  s.pluginManagement.repositories {
+    maven { url 'https://maven.aliyun.com/repository/public' }
+    maven { url 'https://maven.aliyun.com/repository/google' }
+  }
+}
+allprojects {
+  buildscript {
+    repositories {
+      maven { url 'https://maven.aliyun.com/repository/public' }
+      maven { url 'https://maven.aliyun.com/repository/google' }
+    }
+  }
+  repositories {
+    maven { url 'https://maven.aliyun.com/repository/public' }
+    maven { url 'https://maven.aliyun.com/repository/google' }
+  }
+}
