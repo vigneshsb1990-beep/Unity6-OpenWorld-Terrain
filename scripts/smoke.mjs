@@ -50,13 +50,20 @@ const info = await page.evaluate(() => {
   let treeInstances = 0;
   let undergrowthInstances = 0;
   let meshes = 0;
+  const detail = [];
   const g = window.__game;
   if (g) {
     g.scene.traverse((o) => {
       if (o.isInstancedMesh) {
         meshes++;
+        detail.push({
+          count: o.count,
+          alphaTest: o.material?.alphaTest,
+          side: o.material?.side,
+          map: !!o.material?.map,
+          uv: !!o.geometry?.attributes?.uv,
+        });
         if (o.material?.map && o.count > 50 && o.geometry?.attributes?.uv) {
-          // tree canopies have alphaTest + DoubleSide
           if (o.material.alphaTest > 0.3 && o.material.side === 2) treeInstances += o.count;
           else undergrowthInstances += o.count;
         }
@@ -71,6 +78,7 @@ const info = await page.evaluate(() => {
     meshes,
     treeInstances,
     undergrowthInstances,
+    detail,
   };
 });
 

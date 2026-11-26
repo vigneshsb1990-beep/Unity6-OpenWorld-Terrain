@@ -10,11 +10,15 @@ with the game.
 
 - **Forest terrain** — rolling hills (200×200 segment heightmap) with a flattened
   plateau for the palace, plus a dirt path from the forest edge to the gate.
-- **Forest** — ~560 realistic trees rendered as **alpha-cutout billboards**
-  (procedural trunk + leaf-cluster silhouettes, 3 crossed cards each, 3 species
-  with per-instance tint), plus 3D hero trunks with bark + normal maps for
-  close-up parallax, ~1,600 grass/fern undergrowth tufts, and a vertex-shader
-  **wind sway**. Cutout-correct shadows via a custom depth material.
+- **Forest** — ~540 realistic trees across **8 species**: oak, maple (autumn
+  tint), birch (white bark), poplar, pine/conifer, willow (hanging strands),
+  dead/bare, and palm — all **alpha-cutout billboards** (procedural trunk +
+  leaf/needle clusters, 3 crossed cards, per-instance tint/rotation/scale).
+- **Understory** — ~2,000 plants: bushes, ferns, tall grass/reeds, wildflowers,
+  and short grass tufts (crossed billboards).
+- **3D hero trunks** near the path with bark + normal maps for close-up parallax.
+- **Wind sway** — vertex-shader animation (stronger toward the canopy) with
+  per-plant phase; cutout-correct shadows via a custom depth material.
 - **Giant palace with fort** — 120×120 curtain walls with battlements, four
   corner towers with conical roofs, a twin-tower gatehouse with wooden doors,
   a tall central keep with corner turrets, and a residential palace wing.
@@ -33,7 +37,7 @@ www/                 Web game (bundled into the APK)
   css/style.css
   js/main.js         Scene, lights, sky, orbit controls
   js/textures.js     Procedural 2K surface textures
-  js/treetextures.js Realistic tree/bark/grass textures (RGBA)
+  js/treetextures.js Full vegetation library (trees, plants, grass, bark)
   js/terrain.js      Heightmap terrain + path
   js/forest.js       Realistic billboard forest + undergrowth + wind
   js/palace.js       Palace + fort
@@ -78,4 +82,4 @@ cd android && ./gradlew assembleDebug
   covers this).
 - Trees and battlements use `InstancedMesh` to keep draw calls low.
 - Shadow map is 1024²; pixel ratio is capped at 2 for mobile GPUs.
-- ~101k triangles in the default view (billboards keep the forest cheap).
+- ~104k triangles in the default view (billboards keep the forest cheap).

@@ -104,7 +104,7 @@ function buildWorld() {
 
   scene.add(createTerrain(materials));
   scene.add(createPath(materials));
-  scene.add(createForest(materials));
+  scene.add(createForest());
   scene.add(createPalace(materials));
 }
 
