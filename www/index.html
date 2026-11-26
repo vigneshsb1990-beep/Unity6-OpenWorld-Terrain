@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1410" />
+  <link rel="icon" href="data:," />
+  <title>Forest Palace Fort</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app">
+    <canvas id="scene"></canvas>
+
+    <div id="loading">
+      <div class="spinner"></div>
+      <div class="loading-text">Growing the forest…</div>
+      <div class="loading-sub">Generating 2K textures</div>
+    </div>
+
+    <div id="hud">
+      <div class="title">Forest Palace Fort</div>
+      <div class="hint">Drag to orbit · Pinch to zoom</div>
+    </div>
+
+    <div id="stats"></div>
+  </div>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "./vendor/three.module.js"
+      }
+    }
+  </script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

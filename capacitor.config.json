@@ -1,0 +1,9 @@
+{
+  "appId": "com.example.forestpalacefort",
+  "appName": "Forest Palace Fort",
+  "webDir": "www",
+  "backgroundColor": "#0b1410",
+  "android": {
+    "allowMixedContent": false
+  }
+}
