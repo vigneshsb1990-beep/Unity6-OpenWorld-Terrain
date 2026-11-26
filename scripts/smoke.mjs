@@ -47,11 +47,30 @@ await new Promise((r) => setTimeout(r, 1500));
 const info = await page.evaluate(() => {
   const c = document.getElementById("scene");
   const gl = c?.getContext("webgl2") || c?.getContext("webgl");
+  let treeInstances = 0;
+  let undergrowthInstances = 0;
+  let meshes = 0;
+  const g = window.__game;
+  if (g) {
+    g.scene.traverse((o) => {
+      if (o.isInstancedMesh) {
+        meshes++;
+        if (o.material?.map && o.count > 50 && o.geometry?.attributes?.uv) {
+          // tree canopies have alphaTest + DoubleSide
+          if (o.material.alphaTest > 0.3 && o.material.side === 2) treeInstances += o.count;
+          else undergrowthInstances += o.count;
+        }
+      }
+    });
+  }
   return {
     canvas: c ? { w: c.width, h: c.height } : null,
     hasGL: !!gl,
     stats: document.getElementById("stats")?.textContent,
     loadingHidden: document.getElementById("loading")?.classList.contains("hidden"),
+    meshes,
+    treeInstances,
+    undergrowthInstances,
   };
 });
 
@@ -63,6 +82,6 @@ console.log("ERRORS:", errors.length ? JSON.stringify(errors, null, 2) : "none")
 
 await browser.close();
 
-if (!built || errors.length) {
+if (!built || errors.length || !info.treeInstances) {
   process.exit(1);
 }

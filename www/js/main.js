@@ -10,7 +10,7 @@ import {
   makeBarkTexture,
 } from "./textures.js";
 import { createTerrain, createPath } from "./terrain.js";
-import { createForest } from "./forest.js";
+import { createForest, updateWind } from "./forest.js";
 import { createPalace } from "./palace.js";
 
 const canvas = document.getElementById("scene");
@@ -63,6 +63,9 @@ function boot() {
 
   window.addEventListener("resize", onResize);
   document.addEventListener("visibilitychange", () => clock.getDelta());
+
+  // Debug handle (used by the smoke test; harmless on device).
+  window.__game = { scene, camera, renderer };
 
   // Reveal the scene.
   loadingEl.classList.add("hidden");
@@ -162,10 +165,13 @@ function setupSky() {
 let frames = 0;
 let fpsTime = 0;
 let fps = 0;
+let elapsed = 0;
 
 function animate() {
   requestAnimationFrame(animate);
   const dt = clock.getDelta();
+  elapsed += dt;
+  updateWind(elapsed);
   controls.update(dt);
   renderer.render(scene, camera);
 
